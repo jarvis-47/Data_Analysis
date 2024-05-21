@@ -1,0 +1,99 @@
+---
+title: "HW3"
+output: HW3
+---
+
+```{r}
+# Load the trees dataset
+data("trees")
+
+# A: Scatter Plot of Volume Vs Height
+plot(trees$Volume, trees$Height,
+     main = "Scatterplot of Volume Vs Height", xlab = "Volume", ylab = "Height")
+
+# B: Fit SLR. Plot model over the scatter plot
+model <- lm(Height ~ Volume, data = trees)
+abline(model, col="red")
+
+# C: Least squares estimates of β0 and β1
+beta_estimates <- coef(model)
+print(beta_estimates)
+
+# D: LSE for sigma_squared 
+lse_sigma_squared <- sum(model$residuals^2) / model$df.residual
+print(paste("Least squares estimate for σ2: ", lse_sigma_squared))
+
+# E: MLE for sigma_squared 
+mle_sigma_squared <- sum(model$residuals^2) / (model$df.residual + 2)
+print(paste("Maximum likelihood estimate for σ2: ", mle_sigma_squared))
+
+# F: 90% Confidence intervals for β0 and β1
+print("90% Confidence intervals for β0 and β1:")
+confint(model, level = 0.90)
+
+# G: Hypothesis test for β1
+
+# Null hypothesis: β1 ≥ 0.5
+# Alternative hypothesis: β1 < 0.5
+# This will be a one-tailed test
+
+hypothesis <- summary(model)$coefficients[2,]
+p_value <- if (hypothesis[1] < 0.5) hypothesis[4]/2 else 1 - hypothesis[4]/2
+result <- if (p_value< 0.05) "Reject Null Hypothesis" else "FTR Null Hypothesis"
+
+print(paste("P-value: ", p_value))
+print(paste("Hypothesis Decision: ", result))
+```
+PROBLEM 3
+```{r}
+# Read the data into R
+dat.heights <- read.table("C:/Users/param/OneDrive - Clemson University/Desktop/CU/Spring24/DataAnalysis/HW/HW3/family_heights.txt", 
+                          header = T)
+
+# Subset the data for sons only
+son.heights <- dat.heights[dat.heights$Gender == "M", ]
+
+# A: Scatter plot with simple linear regression line for sons' 
+# heights based on fathers' heights
+model <- lm(Height ~ Father, data = son.heights)
+plot(son.heights$Father, son.heights$Height, 
+     main = "Scatterplot of Sons' vs Fathers' Heights with Regression Line", 
+     xlab = "Fathers' Heights (inches)", 
+     ylab = "Sons' Heights (inches)")
+abline(model, col = 'blue')
+
+# B: List and interpret the slope estimate
+# Interpretation: The slope estimate represents the expected change in sons' 
+# height for a one-inch increase in fathers' height.
+slope <- coef(model)['Father']
+cat("Slope Estimate: ", slope)
+
+# C: Plot the residuals and check for any pattern
+residuals <- residuals(model)
+plot(residuals, main = "Residual Plot", 
+     xlab = "Fitted Values", ylab = "Residuals")
+# Interpretation: The residuals bounce randomly across 0. This implies our 
+# linearity assumption holds. Also, the residuals form a horizontal band around 
+# 0, suggesting the error variances are equal.
+
+# D: Normal QQ plot and its interpretation
+qqnorm(residuals)
+qqline(residuals, col = "red")
+# Interpretation: The points lie closely to the qq reference line. Hence, the 
+# residuals follow a normal distribution and our normality of errors assumption
+# holds.
+
+# E: Provide an estimate and 95% confidence interval for the average height of
+# sons whose fathers are 70 inches tall.
+new.data <- data.frame(Father = 70)
+confidence_prediction <- predict(model, new.data, interval = "confidence")
+cat("95% CI for the average height of sons with father's height 70 inches:", confidence_prediction, "\n")
+
+# F: Predict the height of a son whose father is 70 inches tall with a 95%
+# prediction interval
+prediction_interval <- predict(model, new.data, interval = "prediction")
+cat("95% PI for the height of a son with father's height 70 inches:", 
+    prediction_interval, "\n")
+```
+
+
