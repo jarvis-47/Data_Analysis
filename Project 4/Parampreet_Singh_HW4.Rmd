@@ -1,0 +1,246 @@
+DATA ANALYSIS HW4
+
+PROBLEM 1
+
+```{r}
+library(DAAG)
+data("ais")
+
+# A: Linear model with lbm as the response and sport as the predictor
+model_lbm_sport <- lm(LBM ~ Sport, data = ais)
+summary(model_lbm_sport)
+
+# B: Boxplots for lbm according to sport
+boxplot(LBM ~ Sport, data = ais, 
+        main = "Boxplot of LBM by Sport",
+        xlab = "Sport",
+        ylab = "Lean Body Mass")
+```
+C: Interpretation of the F-test -
+The F-test in the summary output is used to determine whether there is a 
+significant effect of sport on lean body mass across the different sports. 
+The null hypothesis for the F-test is that all group means are equal, or in 
+other words, sport has no effect on lean body mass.
+
+The provided output shows an F-statistic value of 12.19 with a p-value of 
+3.562e-15. The very small p-value (much less than any common significance level 
+like 0.05 or 0.01) leads us to reject the null hypothesis. This means there is 
+strong evidence that there are differences in lean body mass among at least some
+of the sports categories.
+
+D: Interpretation of the coefficient estimate for Field and Tennis -
+The coefficient estimate for each sport represents the difference in lean body 
+mass between athletes of that sport and the reference category (which is not 
+shown and is likely the one not listed, often the one alphabetically first if 
+the reference was not manually set).
+
+For sportField, the estimate is 8.2014 with a p-value of 0.01234. Since the 
+p-value is less than 0.05, it suggests that athletes in track and field sports 
+have, on average, 8.2014 units higher lean body mass compared to the reference 
+sport category, holding all else equal, and this difference is statistically 
+significant.
+
+For Tennis, the estimate is -12.0173 with a p-value of 0.00213. This negative 
+coefficient indicates that tennis athletes have, on average, 12.0173 units lower
+lean body mass compared to the reference sport category, holding all else equal,
+and this difference is statistically significant.
+
+To sum up, the lean body mass for track and field athletes is significantly 
+higher than the reference group, while for tennis athletes, it's significantly 
+lower.
+
+```{r}
+# E: Estimate the contrast between Tennis and W_Polo
+library(emmeans)
+
+# Estimate the emmeans for 'sport'
+emm <- emmeans(model_lbm_sport, specs = "Sport")
+
+# Calculate the pairwise contrasts
+contrast_estimate <- pairs(emm)
+
+# We can use the summary function to extract the contrasts
+summary_contrast <- summary(contrast_estimate)
+
+# Find the row in the summary that corresponds to the Tennis vs. W_Polo contrast
+tennis_vs_wpolo_row <- which(summary_contrast$contrast == "tennis - w_polo")
+
+# Obtain the 90% CI for the Tennis vs. W_Polo contrast
+tennis_vs_wpolo_ci <- confint(contrast_estimate, level = 
+                                0.90)[tennis_vs_wpolo_row, ]
+
+# Output the results
+print(tennis_vs_wpolo_ci)
+ 
+# F: Adding the ht (height) variable to the model
+# Fit the model including height
+model_lbm_sport_ht <- lm(LBM ~ Sport + Ht, data = ais)
+
+# Get a summary of the new model to interpret the coefficients
+summary(model_lbm_sport_ht)
+
+```
+Interpretation of the coefficient for ht:
+The coefficient estimate for ht is 1.12073, with a highly significant p-value 
+(p < 2.2e-16). This suggests a strong relationship between height and lean body 
+mass. The interpretation is that for each one-centimeter increase in height, the
+lean body mass is expected to increase by an average of 1.12073 kilograms, 
+assuming all other factors remain constant.
+
+Interpretation of the coefficient for Field now:
+The coefficient for Field (assuming it represents Track and Field athletes) is 
+17.23481 with a p-value < 2.2e-16, which is also highly significant. This 
+suggests that, holding height constant, Track and Field athletes have a lean 
+body mass that is, on average, 17.23481 kilograms more than the reference 
+category.
+
+PROBLEM 2
+
+```{r}
+# A: Fit the model with fertility as the response variable
+library(alr4)
+data("UN11")
+
+model_fertility <- lm(fertility ~ ppgdp + lifeExpF + pctUrban, data = UN11)
+summary(model_fertility)
+
+# B: Plot of fitted values vs. residuals
+plot(fitted(model_fertility), residuals(model_fertility), 
+     main="Fitted Vs Residual Values",
+     xlab="Fitted Values",
+     ylab="Residuals")
+abline(h = 0, col = "red")
+```
+Interpretation: The residual plot of the linear model shows no clear patterns, 
+which implies the linear model might be a suitable fit, as it doesn't seem to 
+violate the linearity assumption significantly.
+
+```{r}
+# C: Scatter plot pairs
+pairs(~fertility + ppgdp + lifeExpF + pctUrban, data = UN11)
+```
+In the scatterplot examining fertility versus per capita GDP, a negative trend 
+emerges, indicating that fertility rates tend to fall as per capita GDP climbs. 
+This trend appears to curve, suggesting a nonlinear relationship. 
+
+When observing fertility against female life expectancy, a negative link is also
+present; nations with longer female life expectancies often have lower fertility
+rates. The pattern here seems fairly straight, hinting at a linear association.
+
+The connection between fertility and the percentage of the urban population 
+isn’t completely linear. Initially, there's considerable variability, yet a
+general negative direction is noticeable, with fertility rates tending to drop 
+as the urban population proportion increases.
+
+Looking at per capita GDP versus female life expectancy, a positive association 
+is discernible. Higher per capita GDP often aligns with longer female life 
+expectancy, and the pattern of this relationship seems to curve, implying 
+nonlinearity.
+
+The relationship between per capita GDP and the percentage of the urban
+population is also positive; higher GDP per capita is linked with a larger urban
+population share, with the relationship again being nonlinear.
+
+Lastly, female life expectancy correlates positively with the percentage of 
+urban population; countries with more urbanized populations generally see higher
+female life expectancies.
+
+The observations of nonlinear trends suggest that simple linear models might not
+adequately capture the nuances of these relationships without transformations of
+the variables, such as applying a logarithmic scale to per capita GDP. 
+Additionally, the presence of positive correlations among per capita GDP, female
+life expectancy, and the urban population percentage raises the issue of 
+potential multicollinearity, which could complicate the interpretation of these 
+variables in a multivariate model.
+```{r}
+# D: Model with log(ppgdp) and related plots
+model_fertility_log_ppgdp <- lm(fertility ~ log(ppgdp) + lifeExpF + pctUrban, 
+                                data = UN11)
+summary(model_fertility_log_ppgdp)
+
+pairs(~fertility + log(ppgdp) + lifeExpF + pctUrban, data = UN11)
+
+plot(fitted(model_fertility_log_ppgdp), residuals(model_fertility_log_ppgdp), 
+     xlab = "Fitted Values", ylab = "Residuals", 
+     main = "Residuals vs Fitted Values with log(ppgdp)")
+abline(h = 0, col = "red")
+```
+The regression analysis shows a significant inverse correlation between a 
+country's GDP per capita and its fertility rate. A one-unit increase in the 
+logged GDP per capita correlates with a 0.1979 unit decrease in the fertility 
+rate, assuming female life expectancy and urbanization rates remain constant. 
+The improved linearity in scatter plots after logging GDP suggests that the 
+transformed model captures the relationship between the variables more 
+effectively. While the spread of residuals still exhibits some variability, the 
+previous cone-shaped pattern is less pronounced, marking an advancement over the
+initial model. However, residual analysis indicates room for further refinement.
+```{r}
+# E:  Model with both log(fertility) and log(ppgdp)
+model_log_fertility_log_ppgdp <- lm(log(fertility) ~ log(ppgdp) + lifeExpF + 
+                                      pctUrban, data = UN11)
+summary(model_log_fertility_log_ppgdp)
+
+pairs(~log(fertility) + log(ppgdp) + lifeExpF + pctUrban, data = UN11)
+
+plot(fitted(model_log_fertility_log_ppgdp), 
+     residuals(model_log_fertility_log_ppgdp), 
+     xlab = "Fitted Values", ylab = "Residuals", 
+     main = "Residuals vs Fitted Values with log(fertility) and log(ppgdp)")
+abline(h = 0, col = "red")
+```
+The regression analysis indicates a significant negative association between a 
+country's GDP per capita and its fertility rate; a one-unit increase in the 
+log-transformed GDP per capita is associated with a 0.0758 unit decrease in 
+fertility rate, holding female life expectancy and urbanization constant. The 
+residual plot shows a marked improvement with a more uniform variance, 
+suggesting an appropriate model fit without discernible trends.
+
+PROBLEM 4
+
+```{r}
+# Part A:
+# Load the Swiss data
+data(swiss)
+
+# Full model with all predictors
+full_model <- lm(Fertility ~ ., data = swiss)
+
+# Forward selection
+forward_model <- step(object = lm(Fertility ~ 1, data = swiss), 
+                      scope = list(lower = formula(lm(Fertility ~ 1, 
+                                                      data = swiss)), 
+                                   upper = formula(full_model)), 
+                      direction = "forward", 
+                      trace = 0)
+
+# Backward selection
+backward_model <- step(full_model, direction = "backward", trace = 0)
+
+# Step wise selection (both forward and backward steps)
+stepwise_model <- step(object = lm(Fertility ~ 1, data = swiss), 
+                       scope = list(lower = formula(lm(Fertility ~ 1, 
+                                                       data = swiss)), 
+                                    upper = formula(full_model)), 
+                       direction = "both", 
+                       trace = 0)
+
+forward_model
+backward_model
+stepwise_model
+
+```
+
+Part B(i):
+The models converge on Education, Catholic, and Infant.Mortality as key 
+predictors for Fertility, though Agriculture's inclusion in only two models 
+hints at its less definitive predictive role.
+
+Part B(ii):
+Education, Catholicism, and Infant Mortality emerge as the most consistent 
+predictors of Fertility across all models, highlighting their strong correlation
+with Fertility in Swiss provinces. Education inversely correlates with Fertility, suggesting that higher educational attainment may lead to lower Fertility rates.
+A higher percentage of Catholics correlates with increased Fertility, while 
+greater Infant Mortality rates also correspond with higher Fertility, 
+potentially indicating compensatory reproductive behavior. These persistent 
+associations across different models reinforce the significance of these factors
+in understanding Fertility trends.
