@@ -1,7 +1,7 @@
 # Assignment 3: Advanced Statistical Analysis and Regression Modeling
 
 ## Overview
-This repository contains the solutions and code for Assignment 3 of the Data Analysis course, part of my Master's in Computer Science. The assignment covers advanced statistical analysis and regression modeling tasks.
+The assignment covers advanced statistical analysis and regression modeling tasks.
 
 ## Problems
 
