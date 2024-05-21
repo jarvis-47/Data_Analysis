@@ -1,0 +1,75 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+PROBLEM 1
+
+Part A: 
+Random Component - diabetes, likely follow a binomial distribution given its yes/no nature. Specifies the distribution of the response variable.
+Systematic Component - predictors or independent variables (glucose, pressure, bmi, age).
+Link function - logit link function -> g(E(Y)) = log(E(Y) / 1 - E(Y)), which connects the mean of the random component to the systematic component.
+
+```{r}
+#Part B: Fit a generalized linear model (GLM) with diabetes as the response variable:
+diabetes_data <- read.csv("diabetes.csv")
+
+glm_model <- glm(diabetes ~ glucose + pressure + bmi + age, 
+                 data = diabetes_data, family = binomial(link = "logit"))
+
+print(summary(glm_model))
+```
+Interpretation - 
+Intercept: The model intercept is approximately -9.582963. The intercept represents the log odds of the outcome (having diabetes) when all the predictors are held at zero, which is not practically interpretable for these variables.
+
+Glucose: The estimated coefficient for glucose is approximately 0.036352. Since it's positive and highly significant (p < 0.001), higher glucose levels are associated with an increased likelihood of diabetes.
+
+Pressure: The estimated coefficient for pressure is approximately -0.002339. The negative sign suggests that higher pressure is associated with a slightly decreased likelihood of diabetes, although the effect is very small and not statistically significant (p > 0.05).
+
+BMI: The estimated coefficient for BMI is approximately 0.078953. The positive coefficient, which is statistically significant (p < 0.001), suggests that higher BMI is associated with an increased likelihood of diabetes.
+
+Age: The estimated coefficient for age is approximately 0.054867. The positive coefficient indicates that the likelihood of diabetes increases with age, and this effect is statistically significant (p < 0.001).
+```{r}
+# Part C: Hypothesis Test
+# H0: beta = 0.05
+# Ha: beta != 0.05
+# alpha = 0.05
+
+# Hypothesized value for age coefficient
+hypothesized_value <- 0.05
+
+# Estimated coefficient and standard error for age from the GLM summary
+estimated_coefficient <- 0.054867
+standard_error <- 0.013810
+
+# Compute the z-statistic
+z_statistic <- (estimated_coefficient - hypothesized_value) / standard_error
+p_value <- 2 * (1 - pnorm(abs(z_statistic)))
+
+print(paste("z_statistic:", z_statistic))
+print(paste("p_value:", p_value))
+```
+The computed z-statistic is approximately 0.352 and the corresponding p-value is approximately 0.724. Since the p-value is greater than the significance level α = 0.05, we fail to reject the null hypothesis. This means there isn't enough statistical evidence to say that the regression coefficient for age is different from 0.05 at the 5% significance level.
+```{r}
+#Part D: calculate the 90% confidence intervals
+confint(glm_model, level = 0.90)
+```
+```{r}
+# Part E: Predicting the probability of being diagnosed with diabetes
+
+predict_data <- data.frame(glucose = 150, pressure = 100, bmi = 20, age = 45)
+logit_prob <- predict(glm_model, newdata = predict_data, type = "response")
+
+print(paste("Diabetic Probability at pressure (",predict_data$pressure,"):",logit_prob))
+
+# Trying with different pressure values
+pressure_values <- c(70, 100, 120, 150)
+probabilities <- sapply(pressure_values, function(p) {
+  predict_data$pressure <- p
+  predict(glm_model, newdata = predict_data, type = "response")
+})
+
+names(probabilities) <- pressure_values
+print(probabilities)
+
+```
+This trend suggests that as blood pressure increases, the model estimates a lower probability of being diagnosed with diabetes, given the specific values for the other variables. This outcome might seem counterintuitive, given that one might expect higher blood pressure to be associated with a higher risk of diabetes. However, this is what the model has estimated based on the data it was trained on.
