@@ -1,4 +1,4 @@
-# Assignment 4: Advanced Statistical Modeling and Variable Selection
+# Project 4: Advanced Statistical Modeling and Variable Selection
 
 ## Overview
 The assignment involves advanced statistical modeling, variable selection, and interpretation of results.
