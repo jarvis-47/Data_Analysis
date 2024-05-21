@@ -1,4 +1,4 @@
-# Assignment 3: Advanced Statistical Analysis and Regression Modeling
+# Project 3: Advanced Statistical Analysis and Regression Modeling
 
 ## Overview
 The assignment covers advanced statistical analysis and regression modeling tasks.
