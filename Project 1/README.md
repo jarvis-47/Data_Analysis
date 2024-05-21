@@ -1,7 +1,7 @@
-# Assignment 1: Statistical Analysis and Data Manipulation
+# Project 1: Statistical Analysis and Data Manipulation
 
 ## Overview
-This repository contains the solutions and code for Assignment 1 of the Data Analysis course, part of my Master's in Computer Science. The assignment involves statistical analysis and data manipulation tasks.
+The assignment involves statistical analysis and data manipulation tasks.
 
 ## Problems
 
