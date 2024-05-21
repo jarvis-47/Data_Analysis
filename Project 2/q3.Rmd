@@ -1,0 +1,70 @@
+---
+title: "HW2"
+author: "Parampreet SIngh"
+date: "2024-02-20"
+output:
+  pdf_document:
+    latex_engine:xelatex
+---
+**Problem 3**
+
+```{r}
+library(readr)
+
+# Load the data from the CSV file
+class_data <- read_csv("C:/Users/param/OneDrive - Clemson University/Desktop/class_data.csv", show_col_types = FALSE)
+
+# Remove rows with missing data (NA values)
+class1 <- na.omit(class_data$class1) # Clean class1 data
+class2 <- class_data$class2
+```
+
+a)Plot the data for each class, and find the average test score for each.
+ANS -
+```{r}
+# Plot the data for each class
+plot(class1, main = "Class 1 Test Scores", xlab = "Student ID", ylab = "Test Score")
+plot(class2, main = "Class 2 Test Scores", xlab = "Student ID", ylab = "Test Score")
+
+# Calculate and print the average test score for each class
+average_class1 <- mean(class1)
+average_class2 <- mean(class2)
+print(paste("Average test score for Class 1:", average_class1))
+print(paste("Average test score for Class 2:", average_class2))
+```
+
+b) For a significance level of 0.05, perform an appropriate test to determine whether the two classes have the same average test scores. Be sure to state the hypotheses and specify which type of test you used, even if you used software to perform the test.
+
+ANS -
+Perform a hypothesis test to determine if there is a difference in means:
+H0: μ1 = μ2 (the two classes have the same average test scores)
+H1: μ1 ≠ μ2 (the two classes do not have the same average test scores)
+
+We use a Two sample t-test for independent samples
+```{r}
+t_test_result <- t.test(class1, class2, alternative = "two.sided", conf.level = 0.95)
+
+# Print the results of the t-test
+print(t_test_result)
+
+# Check the conclusion based on the p-value for alpha = 0.05
+if(t_test_result$p.value < 0.05) {
+  print("Reject the null hypothesis: There is a significant difference in the average test scores.")
+} else {
+  print("Fail to reject the null hypothesis: There is no significant difference in the average test scores.")
+}
+```
+
+c) Using the same type of test as in part (b), do you make a different conclusion if you use a significance level of 0.01? 
+
+ANS -
+Repeat the same hypothesis test with alpha = 0.01
+```{r}
+# Check the conclusion based on the p-value for alpha = 0.01
+if(t_test_result$p.value < 0.01) {
+  print("Reject the null hypothesis at the 0.01 level: There is a significant difference in the average test scores.")
+} else {
+  print("Fail to reject the null hypothesis at the 0.01 level: There is no significant difference in the average test scores.")
+}
+```
+
