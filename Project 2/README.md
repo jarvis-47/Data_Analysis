@@ -1,7 +1,7 @@
-# Assignment 2: Statistical Analysis and Hypothesis Testing
+# Project 2: Statistical Analysis and Hypothesis Testing
 
 ## Overview
-This repository contains the solutions and code for Assignment 2 of the Data Analysis course, part of my Master's in Computer Science. The assignment involves statistical analysis, hypothesis testing, and regression modeling.
+The assignment involves statistical analysis, hypothesis testing, and regression modeling.
 
 ## Problems
 
